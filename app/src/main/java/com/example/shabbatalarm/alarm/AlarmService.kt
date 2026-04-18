@@ -107,14 +107,32 @@ class AlarmService : Service() {
             try {
                 setDataSource(this@AlarmService, toneUri)
                 prepare()
-                // Start quietly; the fade-in coroutine ramps up to full volume.
                 setVolume(FADE_START_VOLUME, FADE_START_VOLUME)
                 start()
                 Log.d(TAG, "Playback started on ALARM stream (fade-in enabled)")
                 scheduleFadeIn()
             } catch (t: Throwable) {
-                Log.e(TAG, "Failed to start playback", t)
-                stopSelf()
+                Log.e(TAG, "Playback failed for $toneUri — trying system default", t)
+                val fallbackUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+                    ?: Settings.System.DEFAULT_ALARM_ALERT_URI
+                try {
+                    reset()
+                    setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_ALARM)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build()
+                    )
+                    isLooping = true
+                    setDataSource(this@AlarmService, fallbackUri)
+                    prepare()
+                    setVolume(1f, 1f)
+                    start()
+                    Log.d(TAG, "Fallback playback (system default) started")
+                } catch (t2: Throwable) {
+                    Log.e(TAG, "Fallback playback also failed", t2)
+                    stopSelf()
+                }
             }
         }
     }

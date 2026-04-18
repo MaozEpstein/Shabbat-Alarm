@@ -14,6 +14,12 @@ data class ScheduledAlarm(
     val repeatWeekly: Boolean
 )
 
+/** A user-added audio file used as an alarm tone. */
+data class CustomTone(
+    val uri: String,
+    val title: String
+)
+
 /**
  * Persists:
  *  - a LIST of scheduled alarms
@@ -153,6 +159,57 @@ class AlarmRepository(context: Context) {
         }.apply()
     }
 
+    // ── Custom (user-added) tones ──────────────────────────────────────────
+
+    fun getCustomTones(): List<CustomTone> {
+        val raw = prefs.getString(KEY_CUSTOM_TONES_JSON, null) ?: return emptyList()
+        return try {
+            val array = JSONArray(raw)
+            buildList {
+                for (i in 0 until array.length()) {
+                    val obj = array.getJSONObject(i)
+                    add(
+                        CustomTone(
+                            uri = obj.getString("uri"),
+                            title = obj.getString("title")
+                        )
+                    )
+                }
+            }
+        } catch (t: Throwable) {
+            emptyList()
+        }
+    }
+
+    /** Returns true on success, false if the max was reached. If the URI already
+     *  exists in the list, returns true (no-op). */
+    fun addCustomTone(uri: String, title: String): Boolean {
+        val current = getCustomTones().toMutableList()
+        if (current.any { it.uri == uri }) return true
+        if (current.size >= MAX_CUSTOM_TONES) return false
+        current.add(CustomTone(uri, title))
+        saveCustomTones(current)
+        return true
+    }
+
+    fun removeCustomTone(uri: String) {
+        val filtered = getCustomTones().filterNot { it.uri == uri }
+        saveCustomTones(filtered)
+    }
+
+    private fun saveCustomTones(list: List<CustomTone>) {
+        val array = JSONArray()
+        list.forEach { ct ->
+            array.put(
+                JSONObject().apply {
+                    put("uri", ct.uri)
+                    put("title", ct.title)
+                }
+            )
+        }
+        prefs.edit().putString(KEY_CUSTOM_TONES_JSON, array.toString()).apply()
+    }
+
     fun getVibrationEnabled(): Boolean = prefs.getBoolean(KEY_VIBRATION, false)
 
     fun setVibrationEnabled(enabled: Boolean) {
@@ -199,5 +256,10 @@ class AlarmRepository(context: Context) {
 
         /** Max number of concurrent alarms the UI allows the user to schedule. */
         const val MAX_ALARMS = 5
+
+        /** Max number of user-added audio files kept in the tone picker. */
+        const val MAX_CUSTOM_TONES = 10
+
+        private const val KEY_CUSTOM_TONES_JSON = "custom_tones_json"
     }
 }

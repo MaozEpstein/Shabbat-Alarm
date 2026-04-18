@@ -1,5 +1,12 @@
 package com.example.shabbatalarm.ui
 
+import android.content.Intent
+import android.net.Uri
+import android.provider.OpenableColumns
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,12 +16,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -65,15 +75,41 @@ fun SettingsDialog(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val tones = remember { AlarmTones.loadAvailable(context) }
+    var tones by remember { mutableStateOf(AlarmTones.loadAvailable(context)) }
     val preview = remember { TonePreview(context, scope) }
 
     var subView by rememberSaveable { mutableStateOf(SettingsSubView.MAIN) }
 
     val systemDefaultLabel = stringResource(R.string.settings_alarm_sound_default)
+    val defaultCustomTitle = stringResource(R.string.custom_tone_default_title)
+    val maxToneToast = stringResource(
+        R.string.max_custom_tones_reached, AlarmRepository.MAX_CUSTOM_TONES
+    )
     val effectiveSelectedUri = currentToneUri ?: tones.firstOrNull()?.uri?.toString()
     val currentToneTitle = tones.firstOrNull { it.uri.toString() == effectiveSelectedUri }
         ?.title ?: systemDefaultLabel
+
+    val audioPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            // Keep access across app restarts (best-effort — some providers reject it).
+            runCatching {
+                context.contentResolver.takePersistableUriPermission(
+                    uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            }
+            val displayName = queryDisplayName(context, uri) ?: defaultCustomTitle
+            val added = AlarmRepository(context).addCustomTone(uri.toString(), displayName)
+            if (!added) {
+                Toast.makeText(context, maxToneToast, Toast.LENGTH_LONG).show()
+            } else {
+                tones = AlarmTones.loadAvailable(context)
+                onToneChange(uri.toString())
+                preview.play(uri)
+            }
+        }
+    }
 
     DisposableEffect(Unit) {
         onDispose { preview.release() }
@@ -97,6 +133,23 @@ fun SettingsDialog(
                         onSelect = { tone ->
                             preview.play(tone.uri)
                             onToneChange(tone.uri.toString())
+                        },
+                        onAddCustomClick = {
+                            preview.release()
+                            audioPickerLauncher.launch(arrayOf("audio/*"))
+                        },
+                        onRemoveCustom = { tone ->
+                            runCatching {
+                                context.contentResolver.releasePersistableUriPermission(
+                                    tone.uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                )
+                            }
+                            AlarmRepository(context).removeCustomTone(tone.uri.toString())
+                            // If user removed the currently-selected tone, reset.
+                            if (tone.uri.toString() == effectiveSelectedUri) {
+                                onToneChange(null)
+                            }
+                            tones = AlarmTones.loadAvailable(context)
                         },
                         onBack = {
                             preview.release()
@@ -306,6 +359,8 @@ private fun AlarmSoundPickerView(
     tones: List<AlarmTone>,
     selectedUri: String?,
     onSelect: (AlarmTone) -> Unit,
+    onAddCustomClick: () -> Unit,
+    onRemoveCustom: (AlarmTone) -> Unit,
     onBack: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -338,11 +393,49 @@ private fun AlarmSoundPickerView(
             .heightIn(max = 360.dp)
             .verticalScroll(rememberScrollState())
     ) {
+        // Add-from-phone action row (always at the top).
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onAddCustomClick)
+                .background(
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.settings_add_custom_tone),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = stringResource(R.string.settings_add_custom_tone_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
         tones.forEach { tone ->
             ToneRow(
                 tone = tone,
                 selected = tone.uri.toString() == selectedUri,
-                onSelect = { onSelect(tone) }
+                onSelect = { onSelect(tone) },
+                onRemove = if (tone.isCustom) {
+                    { onRemoveCustom(tone) }
+                } else null
             )
         }
     }
@@ -357,6 +450,19 @@ private fun AlarmSoundPickerView(
             Text(stringResource(R.string.close))
         }
     }
+}
+
+/** Queries the system for the human-readable name of a content URI. */
+private fun queryDisplayName(context: android.content.Context, uri: Uri): String? {
+    val projection = arrayOf(OpenableColumns.DISPLAY_NAME)
+    return runCatching {
+        context.contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (idx >= 0) cursor.getString(idx) else null
+            } else null
+        }
+    }.getOrNull()
 }
 
 @Composable
@@ -420,7 +526,8 @@ private fun ReminderPickerView(
 private fun ToneRow(
     tone: AlarmTone,
     selected: Boolean,
-    onSelect: () -> Unit
+    onSelect: () -> Unit,
+    onRemove: (() -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
@@ -435,7 +542,20 @@ private fun ToneRow(
             text = tone.title,
             style = MaterialTheme.typography.bodyLarge,
             color = if (selected) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.onSurface
+                    else MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
         )
+        if (onRemove != null) {
+            IconButton(
+                onClick = onRemove,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = stringResource(R.string.cd_remove_custom_tone),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
     }
 }

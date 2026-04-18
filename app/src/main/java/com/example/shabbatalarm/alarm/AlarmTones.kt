@@ -7,7 +7,9 @@ import android.util.Log
 
 data class AlarmTone(
     val title: String,
-    val uri: Uri
+    val uri: Uri,
+    /** True for user-added files (removable), false for system ringtones. */
+    val isCustom: Boolean = false
 )
 
 object AlarmTones {
@@ -15,10 +17,19 @@ object AlarmTones {
     private const val TAG = "AlarmTones"
 
     /**
-     * Lists the alarm ringtones available on the device. The current system-default
-     * tone is placed first for easy identification.
+     * Lists:
+     *   1. User-added custom tones at the top (removable).
+     *   2. System alarm ringtones after, with the current default placed first.
      */
     fun loadAvailable(context: Context): List<AlarmTone> {
+        val custom = AlarmRepository(context).getCustomTones().map { ct ->
+            AlarmTone(title = ct.title, uri = Uri.parse(ct.uri), isCustom = true)
+        }
+        val system = loadSystemTones(context)
+        return custom + system
+    }
+
+    private fun loadSystemTones(context: Context): List<AlarmTone> {
         val tones = mutableListOf<AlarmTone>()
         val defaultUri: Uri? = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
 
@@ -37,7 +48,7 @@ object AlarmTones {
             Log.e(TAG, "Failed to enumerate alarm ringtones", t)
         }
 
-        // Move the system default to the top if we can identify it.
+        // Pull the system default to the top of the system section.
         if (defaultUri != null) {
             val defaultIndex = tones.indexOfFirst { it.uri == defaultUri }
             if (defaultIndex > 0) {

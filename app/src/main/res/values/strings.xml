@@ -63,6 +63,11 @@
     <string name="settings_alarm_sound">צליל שעון מעורר</string>
     <string name="settings_alarm_sound_default">ברירת מחדל של המערכת</string>
     <string name="settings_alarm_sound_hint">הקש על צליל לתצוגה מקדימה של 5 שניות ולבחירתו.</string>
+    <string name="settings_add_custom_tone">הוסף קטע מהטלפון</string>
+    <string name="settings_add_custom_tone_hint">בחר MP3 / WAV / M4A / OGG מאפליקציית הקבצים של הטלפון</string>
+    <string name="custom_tone_default_title">קטע מותאם</string>
+    <string name="max_custom_tones_reached">ניתן להוסיף עד %1$d קטעים מותאמים</string>
+    <string name="cd_remove_custom_tone">הסר קטע מותאם</string>
     <string name="settings_duration">אורך שעון מעורר: %1$d שניות</string>
     <string name="settings_repeat_weekly">חזור כל שבוע</string>
     <string name="settings_repeat_weekly_desc">השעון המעורר יופעל שוב באותה שעה בשבוע הבא.</string>
