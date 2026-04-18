@@ -1,168 +1,277 @@
-# שעון מעורר - לשבת 🕯️
+<div align="center">
 
-אפליקציית אנדרואיד מינימליסטית לשעון מעורר שבתי. מוגדר פעם אחת, פועל פעם אחת, ונעצר לבד אחרי 15 שניות (ניתן לשינוי).
+# 🕯️ שעון מעורר - לשבת
 
----
+### **Shabbat Alarm** — A minimalist Android alarm clock for Shabbat
 
-## 📲 התקנה מהירה
+_An elegant, Hebrew-first alarm app that fires once, plays for exactly the duration you set, and stops itself. Built to wake you reliably — even from Doze mode._
 
-### אופציה 1 — קישור הורדה ישיר
+<br>
 
-> 🔗 **[הורד את ShabbatAlarm.apk](PLACEHOLDER_DOWNLOAD_URL)**
->
-> _(גודל: ~20 MB · דרוש Android 8.0 ומעלה)_
->
-> **שים לב:** החלף את `PLACEHOLDER_DOWNLOAD_URL` בקישור אמיתי אחרי שתעלה את ה-APK ל-GitHub Releases / Google Drive / Dropbox.
+[![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://developer.android.com)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org)
+[![Jetpack Compose](https://img.shields.io/badge/Jetpack_Compose-Material_3-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
+[![License: Personal](https://img.shields.io/badge/License-Personal-888?style=for-the-badge)](#-license)
 
-### אופציה 2 — מחבר שיש לו את האפליקציה
+<br>
 
-קבל את קובץ ה-APK דרך WhatsApp: החבר פותח את האפליקציה → **⚙️ הגדרות** → **"שתף את האפליקציה"** → בוחר אותך ב-WhatsApp.
+**[📥 Install](#-installation)** · **[✨ Features](#-features)** · **[🏗 Architecture](#-architecture)** · **[🛠 Build from source](#-building-from-source)**
 
-### שלבי התקנה (פעם ראשונה)
+</div>
 
-1. פתח את קובץ ה-`.apk` בטלפון (דרך Downloads או קובץ שהתקבל ב-WhatsApp)
-2. אנדרואיד יציג אזהרה **"מקורות לא ידועים"** — לחץ "הגדרות" → הפעל "אפשר מהמקור הזה"
-3. חזור → לחץ **"Install"**
-4. בפתיחה הראשונה אשר הרשאות:
-   - 🔔 **התראות** — כדי שתראה את האזעקה
-   - ⏰ **אזעקות מדויקות** — כדי שהשעון יפעל בזמן
-5. ב-**Settings → Apps → Shabbat Alarm → Battery** → בטל אופטימיזציית סוללה (או לחץ "תקן עכשיו" בכרטיסייה האדומה שמופיעה בתוך האפליקציה)
+<br>
 
 ---
 
-## ✨ מה האפליקציה עושה
+## 🎯 Why this app?
 
-### הבסיס
-- ✅ **עד 5 שעונים מעוררים במקביל** — למשל: הדלקת נרות + הבדלה
-- ✅ **חד-פעמי או שבועי** — כל שעון עצמאי, עם אפשרות לחזרה אוטומטית
-- ✅ **עצירה אוטומטית** — 15 שניות כברירת מחדל (ניתן לשנות 5-60 שניות)
-- ✅ **עמיד ל-Doze Mode** — פועל גם כשהטלפון ישן זמן רב
-- ✅ **משתמש בערוץ ALARM** — מכבד את עוצמת האזעקות במערכת
+Most alarm apps are built for waking up on weekdays — they expect snooze, dismiss, and endless interaction.
 
-### זמני שבת
-- 🕯️ **זמני שבת לשמונה ערים מרכזיות בישראל** — ירושלים, תל אביב, חיפה, באר שבע, אילת, טבריה, נתניה, אשדוד (חישוב אוטומטי, ללא אינטרנט)
-- 📅 **תאריך עברי ולועזי** — "יום שישי, 25 באפריל · י״א באייר התשפ״ו"
-- 📖 **זמנים נוספים** בלשונית — סוף זמן קריאת שמע, מנחה גדולה/קטנה, פלג המנחה, שקיעה וכו׳. בחירת עיר מתוך dropdown.
-- 🎉 **זיהוי חגים אוטומטי** — כשיש יום טוב קרוב (אפילו באמצע השבוע), האפליקציה מציגה "זמני יום טוב — שמחת תורה" במקום "זמני שבת"
-- ⏰ **תזכורת מקדימה** — 40 דקות לפני כניסת שבת בירושלים (כ-60 דק׳ בשאר הארץ), התראה עדינה ללא צליל
+**Shabbat observance is different.** You set the alarm, and on Shabbat you shouldn't touch the phone.
 
-### התאמה אישית
-- 🔊 **בחירת צליל אזעקה** — מתוך צלילי המערכת, עם תצוגה מקדימה של 5 שניות
-- 🎵 **הוספת קטעי מוזיקה מהטלפון** — בחר MP3/WAV/M4A/OGG מכל אפליקציית קבצים (עד 10 קטעים מותאמים)
-- 📳 **רטט אופציונלי** — בנוסף לצליל
-- 🌅 **Fade-in עוצמה** — מתחיל חלש ועולה בהדרגה
+This app is built around one promise:
 
-### עיצוב
-- 🎨 **ממשק עברי מלא** — RTL, טיפוגרפיה סריף, ערכת צבעי זהב וכחול-לילה
-- 🕯️ **נר מונפש** במסך הראשי — מרצד כשיש שעון מעורר פעיל
-- ✨ **אייקון מעוצב** — וקטור עם גרדיאנטים והילה זוהרת
-- 🌙 **תמיכה ב-Dark Mode** — עקב הגדרות המערכת
-- 📤 **שיתוף APK** ישירות מהאפליקציה — כפתור שולח את קובץ ההתקנה ב-WhatsApp
+> **Set once. Fires once. Plays exactly N seconds. Stops itself. Never asks you to interact.**
 
-### אבטחה ואמינות
-- 🔒 **אזהרת Battery Optimization** — מתריע כשהמערכת עלולה לעכב את האזעקה
-- 💪 **WakeLock** — מבטיח שה-CPU ער בזמן הניגון
-- 🔄 **שחזור אחרי reboot** — כל השעונים המעוררים שורדים אתחול של הטלפון
-- 🔁 **Self-healing** — אזעקה שבועית שפוספסה (טלפון כבוי שבוע) קופצת אוטומטית ליום שישי הבא
-- 🔁 **Fallback לצליל מערכת** — אם קטע מותאם נמחק/נעלם, האפליקציה משמיעה את ברירת המחדל של המערכת
+No snooze. No dismiss. No ongoing notification you have to swipe away. Just a reliable reminder that respects Shabbat.
+
+<br>
 
 ---
 
-## 🏗 ארכיטקטורה טכנית (תמצית)
+## 📲 Installation
 
-### ערימת טכנולוגיות
-| רכיב | בחירה |
-|---|---|
-| שפה | **Kotlin 2.0** |
-| UI | **Jetpack Compose** + Material 3 |
-| תזמון | `AlarmManager.setExactAndAllowWhileIdle` |
-| ניגון | `MediaPlayer` על `USAGE_ALARM` |
-| אמינות | `PARTIAL_WAKE_LOCK` + Foreground Service |
-| זמני שבת | **KosherJava 2.5.0** |
-| אחסון | SharedPreferences |
-| Concurrency | Kotlin Coroutines |
+### Quick install (end users)
 
-### זרימת האזעקה
+> 🔗 **[Download ShabbatAlarm.apk](PLACEHOLDER_DOWNLOAD_URL)**
+> _Debug build · ~20 MB · Android 8.0+_
+
+<details>
+<summary><b>📖 First-time installation walkthrough</b></summary>
+
+1. Open the `.apk` file on your phone (from Downloads or WhatsApp)
+2. Android will warn "**Untrusted source**" — tap **Settings** → enable **Allow from this source**
+3. Tap **Install**
+4. On first launch, grant:
+   - 🔔 **Notifications** — so you see the alarm
+   - ⏰ **Exact alarms** — so it fires on time
+5. In **Settings → Apps → Shabbat Alarm → Battery**, disable battery optimization
+   (or tap **"Fix now"** on the warning card shown in-app)
+
+</details>
+
+### Alternative: get it from a friend
+
+Anyone who has the app installed can share it via **⚙️ Settings → "Share app"** — Android's share sheet opens and they send the APK to you through WhatsApp, Drive, or email.
+
+<br>
+
+---
+
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%">
+
+### 🕯 Core alarm
+- Up to **5 concurrent alarms** (candle lighting + Havdalah + ...)
+- **Adjustable duration** 5–60 seconds (default 15)
+- **One-shot or weekly** — per alarm
+- Plays on **ALARM audio stream** — respects system alarm volume
+- **Fade-in volume** — gentle wake
+- **Optional vibration**
+
+### 📅 Shabbat times
+- **8 Israeli cities** with accurate candle-lighting + Havdalah calculations
+- **Hebrew dates** in dialog (`י״א באייר התשפ״ו`)
+- **Advanced zmanim tab** — Mincha Gedola/Ketana, Sof Zman Shma, etc. with city picker
+- **Automatic holiday detection** — shows "Yom Tov times" when applicable
+- **Pre-Shabbat reminder** — 40 min before candle lighting in Jerusalem
+
+</td>
+<td width="50%">
+
+### 🎨 Design
+- **Hebrew-first + full RTL** layout
+- **Custom Shabbat palette** — gold + deep navy
+- **Animated candle** on main screen (flickers when alarm is set)
+- **Hand-designed icon** with gradients and warm halo
+- **Light + Dark mode** (follows system)
+- **Home screen widget** — next alarm always visible
+
+### 🔒 Reliability
+- **Doze-mode resilient** — `setExactAndAllowWhileIdle`
+- **Partial WakeLock** — CPU stays awake during playback
+- **Reboot recovery** — scheduled alarms survive restart
+- **Self-healing weekly alarms** — catches up after days offline
+- **Battery optimization warning** — detects and nudges user to fix
+- **Fallback tone** — if a custom file is deleted, falls back to system default
+
+### 🎵 Personalization
+- **Pick any audio file** from the phone as an alarm tone (up to 10 custom tones)
+- **System ringtones** with 5-second preview before choosing
+- **Share the APK** directly from within the app
+
+</td>
+</tr>
+</table>
+
+<br>
+
+---
+
+## 🏗 Architecture
+
+### Tech stack
+
+<div align="center">
+
+| Layer | Choice |
+|:---:|:---|
+| **Language** | Kotlin 2.0 |
+| **UI** | Jetpack Compose + Material 3 |
+| **Scheduling** | `AlarmManager.setExactAndAllowWhileIdle` |
+| **Playback** | `MediaPlayer` on `USAGE_ALARM` stream |
+| **Reliability** | `PARTIAL_WAKE_LOCK` + Foreground Service |
+| **Shabbat math** | [KosherJava](https://github.com/KosherJava/zmanim) 2.5.0 |
+| **Storage** | SharedPreferences + JSON |
+| **Concurrency** | Kotlin Coroutines |
+| **Min SDK** | 26 (Android 8.0 Oreo) |
+| **Target SDK** | 34 (Android 14) |
+
+</div>
+
+### Alarm flow
+
 ```
 MainActivity (Compose UI)
-         ↓ Set Alarm
-AlarmScheduler → AlarmManager.setExactAndAllowWhileIdle
-         ↓ (alarm fires)
-AlarmReceiver → acquire WakeLock + start Service
-         ↓
-AlarmService → MediaPlayer + vibration + 15s Coroutine
-         ↓
-stopSelf() → cleanup & release WakeLock
+         ↓ user sets alarm
+AlarmScheduler → AlarmManager.setExactAndAllowWhileIdle(triggerMillis, PendingIntent)
+         ↓ (at trigger time)
+AlarmReceiver → acquire PARTIAL_WAKE_LOCK → ContextCompat.startForegroundService(…)
+         ↓                                     ↓
+  (reschedule weekly)                    AlarmService
+                                               ↓
+                                     MediaPlayer + vibration
+                                     + fade-in + 15s Coroutine
+                                               ↓
+                                     stopSelf() → release WakeLock
+                                               ↓
+                                     ShabbatAlarmWidget.updateAll()
 ```
 
-### מבנה הקוד
-```
-com.example.shabbatalarm/
-├── MainActivity.kt
-├── ShabbatAlarmApp.kt               (Application + שני ערוצי התראות)
-├── alarm/
-│   ├── AlarmReceiver.kt             (קולט ירי אזעקה, מחדש שבועית לפי ID)
-│   ├── AlarmService.kt              (ניגון + רטט + עצירה + fallback)
-│   ├── AlarmScheduler.kt            (עטיפה ל-AlarmManager, תומך ריבוי אזעקות)
-│   ├── AlarmRepository.kt           (SharedPreferences: רשימת אזעקות, הגדרות, קטעים מותאמים)
-│   ├── AlarmWakeLock.kt             (PARTIAL_WAKE_LOCK singleton)
-│   ├── AlarmTones.kt                (צלילי מערכת + קטעים מותאמים של המשתמש)
-│   ├── BootReceiver.kt              (שחזור כל האזעקות + התזכורת אחרי reboot)
-│   ├── ShabbatTimes.kt              (זמני שבת + זמנים נוספים + זיהוי חגים + תאריך עברי)
-│   ├── ShabbatReminderScheduler.kt  (תזכורת שבועית לירושלים)
-│   └── ShabbatReminderReceiver.kt   (התראת 40 דק׳ + תזמון שבוע הבא)
-└── ui/
-    ├── AlarmScreen.kt               (מסך ראשי: TimePicker + רשימת אזעקות)
-    ├── AnimatedCandle.kt            (ציור Canvas + flicker אנימציה)
-    ├── ShabbatTimesDialog.kt        (ℹ️ לשוניות: זמני שבת + זמנים נוספים)
-    ├── SettingsDialog.kt            (⚙️ + sub-views: צליל/תזכורת)
-    ├── BatteryOptimizationCard.kt   (כרטיסיית אזהרה)
-    ├── TonePreview.kt               (MediaPlayer נגן מקדים של 5 שניות)
-    ├── ApkSharer.kt                 (FileProvider + Intent.ACTION_SEND)
-    └── theme/                       (Color, Typography, Theme)
-```
-
-### הרשאות מניפסט
-- `SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM` — לתזמון מדויק
-- `WAKE_LOCK` — לחיזוק מול Doze
-- `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` — לניגון
-- `POST_NOTIFICATIONS` — להתראות
-- `RECEIVE_BOOT_COMPLETED` — לשחזור אחרי reboot
-- `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` — לעקיפת Doze
-- `VIBRATE` — לרטט אופציונלי
+<br>
 
 ---
 
-## 🛠 בנייה מקוד מקור
+## 📁 Project structure
 
-### דרישות
-- Android Studio **Ladybug** (2024.2) ומעלה
-- JDK 17
-- Android SDK API 34
+<details>
+<summary><b>Click to expand</b></summary>
 
-### צעדים
+```
+app/src/main/java/com/example/shabbatalarm/
+├── MainActivity.kt                  · Compose entry point, forces RTL
+├── ShabbatAlarmApp.kt               · Application, creates notification channels
+│
+├── alarm/
+│   ├── AlarmRepository.kt           · SharedPreferences — alarm list, settings,
+│   │                                  custom tones (with migration from v1)
+│   ├── AlarmScheduler.kt            · AlarmManager wrapper (per-alarm IDs)
+│   ├── AlarmReceiver.kt             · Catches alarm fire, reschedules weekly
+│   ├── AlarmService.kt              · Foreground service — playback + vibration
+│   ├── AlarmWakeLock.kt             · PARTIAL_WAKE_LOCK singleton
+│   ├── AlarmTones.kt                · System ringtones + user's custom tones
+│   ├── BootReceiver.kt              · Restores alarms after reboot
+│   ├── ShabbatTimes.kt              · Shabbat + holiday times + Hebrew dates
+│   ├── ShabbatReminderScheduler.kt  · Weekly Jerusalem-anchored reminder
+│   └── ShabbatReminderReceiver.kt   · 40-min-before notification
+│
+├── ui/
+│   ├── AlarmScreen.kt               · Main screen — TimePicker + list
+│   ├── AnimatedCandle.kt            · Canvas drawing with flicker animation
+│   ├── ShabbatTimesDialog.kt        · Two tabs: times + advanced zmanim
+│   ├── SettingsDialog.kt            · Sub-views: sound picker, reminder
+│   ├── BatteryOptimizationCard.kt   · Warning card
+│   ├── TonePreview.kt               · 5-second audio preview
+│   ├── ApkSharer.kt                 · FileProvider + Intent.ACTION_SEND
+│   └── theme/                       · Color, Typography, Theme
+│
+└── widget/
+    └── ShabbatAlarmWidget.kt        · Home screen widget provider
+```
+
+</details>
+
+### Manifest permissions
+
+| Permission | Purpose |
+|---|---|
+| `SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM` | Exact alarms on API 31+ |
+| `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | Playback service |
+| `WAKE_LOCK` | Keep CPU awake during playback |
+| `RECEIVE_BOOT_COMPLETED` | Re-arm alarms after reboot |
+| `POST_NOTIFICATIONS` | Display alarm & reminder notifications |
+| `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` | Bypass Doze restrictions |
+| `VIBRATE` | Optional vibration |
+
+<br>
+
+---
+
+## 🛠 Building from source
+
+### Requirements
+
+- **Android Studio** Ladybug (2024.2) or newer
+- **JDK 17**
+- **Android SDK** with API 34
+
+### Clone and run
+
 ```bash
-# שיבוט הרפו
 git clone <your-repo-url>
 cd shabat-alarm
 
-# פתח ב-Android Studio
-# Run ▶ (Gradle Sync יקרה אוטומטית)
+# Open in Android Studio — Gradle sync will run automatically.
+# Then press Run ▶
 ```
 
-### יצירת APK לשיתוף
-**Android Studio → Build → Build Bundle(s) / APK(s) → Build APK(s)**
+### Build an APK for distribution
 
-הקובץ יופיע ב-`app/build/outputs/apk/debug/app-debug.apk`.
+```
+Build → Build Bundle(s) / APK(s) → Build APK(s)
+```
 
----
+Output: `app/build/outputs/apk/debug/app-debug.apk`
 
-## 📄 רישיון
-
-פרויקט אישי · לא למטרות מסחריות.
-
-שימוש בספריית **KosherJava** תחת רישיון LGPL.
+<br>
 
 ---
 
-**נבנה ב-Cursor + Claude Code + Android Studio** 🛠️
+## 🙏 Acknowledgments
+
+- **[KosherJava](https://github.com/KosherJava/zmanim)** — the astronomical calculations for candle lighting and Havdalah times. The gold standard for Jewish calendar math.
+- **Google Material Design** — color system, typography guidelines, and Compose components.
+- Built collaboratively with **Claude** (Anthropic) in **Cursor**, deployed through **Android Studio**.
+
+<br>
+
+---
+
+## 📄 License
+
+Personal project · Not for commercial distribution.
+
+**KosherJava** is used under its LGPL license.
+
+<br>
+
+<div align="center">
+
+_Built with ❤️ for Shabbat_
+
+**[⬆ Back to top](#️-שעון-מעורר---לשבת)**
+
+</div>
