@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.example.shabbatalarm.widget.ShabbatAlarmWidget
 import java.util.Calendar
 
 /**
@@ -50,6 +51,9 @@ class BootReceiver : BroadcastReceiver() {
                 scheduler.schedule(arm)
             }
         }
+
+        // Make sure the widget reflects the re-armed state after reboot.
+        ShabbatAlarmWidget.updateAll(context)
     }
 
     companion object {

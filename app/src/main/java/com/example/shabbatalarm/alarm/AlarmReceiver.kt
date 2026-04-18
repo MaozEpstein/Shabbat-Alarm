@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.content.ContextCompat
+import com.example.shabbatalarm.widget.ShabbatAlarmWidget
 import java.util.Calendar
 
 class AlarmReceiver : BroadcastReceiver() {
@@ -34,6 +35,9 @@ class AlarmReceiver : BroadcastReceiver() {
 
         val serviceIntent = Intent(context, AlarmService::class.java)
         ContextCompat.startForegroundService(context, serviceIntent)
+
+        // Refresh the home-screen widget (next alarm may have changed).
+        ShabbatAlarmWidget.updateAll(context)
     }
 
     /** Adds exactly 7 calendar days, preserving wall-clock time across DST transitions. */

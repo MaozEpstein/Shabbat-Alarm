@@ -67,6 +67,7 @@ import com.example.shabbatalarm.alarm.AlarmRepository
 import com.example.shabbatalarm.alarm.AlarmScheduler
 import com.example.shabbatalarm.alarm.ScheduledAlarm
 import com.example.shabbatalarm.alarm.ShabbatReminderScheduler
+import com.example.shabbatalarm.widget.ShabbatAlarmWidget
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -248,6 +249,7 @@ fun AlarmScreen(modifier: Modifier = Modifier) {
                 val newAlarm = repository.addAlarm(triggerAt, repeatWeekly)
                 scheduler.schedule(newAlarm)
                 alarms = repository.getActiveAlarms()
+                ShabbatAlarmWidget.updateAll(context)
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -275,6 +277,7 @@ fun AlarmScreen(modifier: Modifier = Modifier) {
                             scheduler.cancel(alarm.id)
                             repository.removeAlarm(alarm.id)
                             alarms = repository.getActiveAlarms()
+                            ShabbatAlarmWidget.updateAll(context)
                         }
                     )
                 }

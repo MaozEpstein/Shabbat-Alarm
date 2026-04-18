@@ -91,6 +91,12 @@
     <string name="notification_channel_name">שעון מעורר - לשבת</string>
     <string name="notification_channel_description">משמיע את צליל השעון המעורר של השבת</string>
 
+    <!-- Home screen widget -->
+    <string name="widget_title">השעון המעורר הבא</string>
+    <string name="widget_no_alarm">אין שעון</string>
+    <string name="widget_today">היום</string>
+    <string name="widget_tomorrow">מחר</string>
+
     <!-- Share APK -->
     <string name="settings_share_app">שתף את האפליקציה</string>
     <string name="settings_share_app_desc">שלח את קובץ ההתקנה לחברים</string>
