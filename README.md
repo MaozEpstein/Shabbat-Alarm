@@ -41,14 +41,22 @@ No snooze. No dismiss. No lingering notification to swipe away. Just a gentle re
 
 <div align="center">
 
-<p>
-  <img src="docs/screenshots/home.png" alt="Home screen" width="200"/>
-  <img src="docs/screenshots/shabbat-times.png" alt="Shabbat times" width="200"/>
-  <img src="docs/screenshots/zmanim.png" alt="Advanced zmanim" width="200"/>
-  <img src="docs/screenshots/settings.png" alt="Settings" width="200"/>
-</p>
-
-<sub><b>Home</b> · <b>Shabbat times</b> · <b>Advanced zmanim</b> · <b>Settings</b></sub>
+<div dir="ltr">
+<table>
+<tr>
+<td align="center" width="25%"><img src="docs/screenshots/home.jpg" alt="Home" width="220"/></td>
+<td align="center" width="25%"><img src="docs/screenshots/shabbat-times.jpg" alt="Shabbat times" width="220"/></td>
+<td align="center" width="25%"><img src="docs/screenshots/zmanim.jpg" alt="Zmanim" width="220"/></td>
+<td align="center" width="25%"><img src="docs/screenshots/settings.jpg" alt="Settings" width="220"/></td>
+</tr>
+<tr>
+<td align="center"><sub><b>🏠 מסך ראשי</b><br/>בוחרים שעה — ומסיימים</sub></td>
+<td align="center"><sub><b>🕯️ זמני כניסה ויציאה</b><br/>8 ערים בישראל</sub></td>
+<td align="center"><sub><b>📜 זמנים נוספים</b><br/>סוף זמן שמע, פלג המנחה…</sub></td>
+<td align="center"><sub><b>⚙️ הגדרות</b><br/>צליל, רטט, תזכורות</sub></td>
+</tr>
+</table>
+</div>
 
 </div>
 
