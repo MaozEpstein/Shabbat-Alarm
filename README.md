@@ -1,21 +1,21 @@
 <div align="center">
 
-# 🕯️ שעון מעורר - לשבת
+# 🕯️ שעון מעורר — לשבת
 
-### **Shabbat Alarm** — A minimalist Android alarm clock for Shabbat
+### **Shabbat Alarm**
 
-_An elegant, Hebrew-first alarm app that fires once, plays for exactly the duration you set, and stops itself. Built to wake you reliably — even from Doze mode._
+_A minimalist, Hebrew-first Android alarm — built for the one day a week you don't want to touch your phone._
 
 <br>
 
 [![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://developer.android.com)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org)
-[![Jetpack Compose](https://img.shields.io/badge/Jetpack_Compose-Material_3-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
-[![License: Personal](https://img.shields.io/badge/License-Personal-888?style=for-the-badge)](#-license)
+[![Jetpack Compose](https://img.shields.io/badge/Compose-Material_3-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
+[![KosherJava](https://img.shields.io/badge/KosherJava-zmanim-D4A017?style=for-the-badge)](https://github.com/KosherJava/zmanim)
 
 <br>
 
-**[📥 Install](#-installation)** · **[✨ Features](#-features)** · **[🏗 Architecture](#-architecture)** · **[🛠 Build from source](#-building-from-source)**
+**[📸 Screenshots](#-screenshots)** · **[✨ Features](#-features)** · **[📥 Install](#-installation)** · **[🏗 Architecture](#-architecture)** · **[🛠 Build](#-building-from-source)**
 
 </div>
 
@@ -23,17 +23,98 @@ _An elegant, Hebrew-first alarm app that fires once, plays for exactly the durat
 
 ---
 
-## 🎯 Why this app?
+## 🎯 Why another alarm app?
 
-Most alarm apps are built for waking up on weekdays — they expect snooze, dismiss, and endless interaction.
+Weekday alarm apps are built around interaction — snooze, dismiss, swipe, tap. **Shabbat is the opposite.** You set the alarm Friday afternoon, and from that moment you shouldn't touch the phone.
 
-**Shabbat observance is different.** You set the alarm, and on Shabbat you shouldn't touch the phone.
+This app is built around a single promise:
 
-This app is built around one promise:
+> **Set once. Fires once. Plays for exactly N seconds. Stops itself. Never asks you to interact.**
 
-> **Set once. Fires once. Plays exactly N seconds. Stops itself. Never asks you to interact.**
+No snooze. No dismiss. No lingering notification to swipe away. Just a gentle reminder that respects Shabbat — and fires reliably even from Doze mode.
 
-No snooze. No dismiss. No ongoing notification you have to swipe away. Just a reliable reminder that respects Shabbat.
+<br>
+
+---
+
+## 📸 Screenshots
+
+<div align="center">
+
+<table>
+<tr>
+<td align="center" width="25%">
+  <img src="docs/screenshots/home.png" alt="Home screen" width="220"/><br>
+  <sub><b>🏠 מסך ראשי</b><br/>בוחרים שעה — ומסיימים</sub>
+</td>
+<td align="center" width="25%">
+  <img src="docs/screenshots/shabbat-times.png" alt="Shabbat times" width="220"/><br>
+  <sub><b>🕯️ זמני כניסה ויציאה</b><br/>8 ערים בישראל</sub>
+</td>
+<td align="center" width="25%">
+  <img src="docs/screenshots/zmanim.png" alt="Advanced zmanim" width="220"/><br>
+  <sub><b>📜 זמנים נוספים</b><br/>סוף זמן שמע, פלג המנחה…</sub>
+</td>
+<td align="center" width="25%">
+  <img src="docs/screenshots/settings.png" alt="Settings" width="220"/><br>
+  <sub><b>⚙️ הגדרות</b><br/>צליל, רטט, תזכורות</sub>
+</td>
+</tr>
+</table>
+
+</div>
+
+<br>
+
+---
+
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 🕯 Core alarm
+- Up to **5 concurrent alarms** (הדלקת נרות + הבדלה + ...)
+- **Adjustable duration** 5–60s (default 15s)
+- **One-shot or weekly** — per alarm
+- Plays on the **ALARM audio stream** — respects system volume
+- **Fade-in** — gentle wake
+- **Optional vibration**
+
+### 📅 Shabbat times
+- **8 Israeli cities** with accurate candle-lighting + Havdalah
+- **Hebrew dates** (`ז׳ באייר התשפ״ו`)
+- **Advanced zmanim** — Sof Zman Shma, Mincha Gedola/Ketana, Plag, שקיעה
+- **Automatic Yom Tov detection** — switches to holiday times
+- **Pre-Shabbat reminder** — 40 min before candle lighting
+
+</td>
+<td width="50%" valign="top">
+
+### 🎨 Design
+- **Hebrew-first, full RTL** layout
+- **Custom Shabbat palette** — warm gold + deep navy
+- **Animated candle** that flickers when an alarm is armed
+- **Hand-designed icon** with gradients + warm halo
+- **Light + Dark mode** (follows system)
+- **Home screen widget** — next alarm always in sight
+
+### 🔒 Reliability
+- **Doze-mode resilient** — `setExactAndAllowWhileIdle`
+- **Partial WakeLock** — CPU stays awake during playback
+- **Reboot recovery** — alarms survive restart
+- **Self-healing weekly alarms** — catches up after days offline
+- **Battery-optimization warning** — detects and nudges you to fix
+
+### 🎵 Personalization
+- **Pick any audio file** from the phone (up to 10 custom tones)
+- **System ringtones** with 5-second preview
+- **Share the APK** to friends straight from Settings
+
+</td>
+</tr>
+</table>
 
 <br>
 
@@ -56,74 +137,19 @@ No snooze. No dismiss. No ongoing notification you have to swipe away. Just a re
    - 🔔 **Notifications** — so you see the alarm
    - ⏰ **Exact alarms** — so it fires on time
 5. In **Settings → Apps → Shabbat Alarm → Battery**, disable battery optimization
-   (or tap **"Fix now"** on the warning card shown in-app)
+   (or tap **"Fix now"** on the in-app warning card)
 
 </details>
 
 ### Alternative: get it from a friend
 
-Anyone who has the app installed can share it via **⚙️ Settings → "Share app"** — Android's share sheet opens and they send the APK to you through WhatsApp, Drive, or email.
-
-<br>
-
----
-
-## ✨ Features
-
-<table>
-<tr>
-<td width="50%">
-
-### 🕯 Core alarm
-- Up to **5 concurrent alarms** (candle lighting + Havdalah + ...)
-- **Adjustable duration** 5–60 seconds (default 15)
-- **One-shot or weekly** — per alarm
-- Plays on **ALARM audio stream** — respects system alarm volume
-- **Fade-in volume** — gentle wake
-- **Optional vibration**
-
-### 📅 Shabbat times
-- **8 Israeli cities** with accurate candle-lighting + Havdalah calculations
-- **Hebrew dates** in dialog (`י״א באייר התשפ״ו`)
-- **Advanced zmanim tab** — Mincha Gedola/Ketana, Sof Zman Shma, etc. with city picker
-- **Automatic holiday detection** — shows "Yom Tov times" when applicable
-- **Pre-Shabbat reminder** — 40 min before candle lighting in Jerusalem
-
-</td>
-<td width="50%">
-
-### 🎨 Design
-- **Hebrew-first + full RTL** layout
-- **Custom Shabbat palette** — gold + deep navy
-- **Animated candle** on main screen (flickers when alarm is set)
-- **Hand-designed icon** with gradients and warm halo
-- **Light + Dark mode** (follows system)
-- **Home screen widget** — next alarm always visible
-
-### 🔒 Reliability
-- **Doze-mode resilient** — `setExactAndAllowWhileIdle`
-- **Partial WakeLock** — CPU stays awake during playback
-- **Reboot recovery** — scheduled alarms survive restart
-- **Self-healing weekly alarms** — catches up after days offline
-- **Battery optimization warning** — detects and nudges user to fix
-- **Fallback tone** — if a custom file is deleted, falls back to system default
-
-### 🎵 Personalization
-- **Pick any audio file** from the phone as an alarm tone (up to 10 custom tones)
-- **System ringtones** with 5-second preview before choosing
-- **Share the APK** directly from within the app
-
-</td>
-</tr>
-</table>
+Anyone who has the app can share it via **⚙️ Settings → "שתף את האפליקציה"** — Android's share sheet opens and the APK goes out through WhatsApp, Drive, or email.
 
 <br>
 
 ---
 
 ## 🏗 Architecture
-
-### Tech stack
 
 <div align="center">
 
@@ -137,8 +163,7 @@ Anyone who has the app installed can share it via **⚙️ Settings → "Share a
 | **Shabbat math** | [KosherJava](https://github.com/KosherJava/zmanim) 2.5.0 |
 | **Storage** | SharedPreferences + JSON |
 | **Concurrency** | Kotlin Coroutines |
-| **Min SDK** | 26 (Android 8.0 Oreo) |
-| **Target SDK** | 34 (Android 14) |
+| **Min / Target SDK** | 26 (Android 8) / 34 (Android 14) |
 
 </div>
 
@@ -149,12 +174,12 @@ MainActivity (Compose UI)
          ↓ user sets alarm
 AlarmScheduler → AlarmManager.setExactAndAllowWhileIdle(triggerMillis, PendingIntent)
          ↓ (at trigger time)
-AlarmReceiver → acquire PARTIAL_WAKE_LOCK → ContextCompat.startForegroundService(…)
+AlarmReceiver → acquire PARTIAL_WAKE_LOCK → startForegroundService(…)
          ↓                                     ↓
   (reschedule weekly)                    AlarmService
                                                ↓
                                      MediaPlayer + vibration
-                                     + fade-in + 15s Coroutine
+                                     + fade-in + N-sec Coroutine
                                                ↓
                                      stopSelf() → release WakeLock
                                                ↓
@@ -234,7 +259,7 @@ app/src/main/java/com/example/shabbatalarm/
 git clone <your-repo-url>
 cd shabat-alarm
 
-# Open in Android Studio — Gradle sync will run automatically.
+# Open in Android Studio — Gradle sync runs automatically.
 # Then press Run ▶
 ```
 
@@ -253,7 +278,7 @@ Output: `app/build/outputs/apk/debug/app-debug.apk`
 ## 🙏 Acknowledgments
 
 - **[KosherJava](https://github.com/KosherJava/zmanim)** — the astronomical calculations for candle lighting and Havdalah times. The gold standard for Jewish calendar math.
-- **Google Material Design** — color system, typography guidelines, and Compose components.
+- **Google Material Design** — color system, typography, and Compose components.
 - Built collaboratively with **Claude** (Anthropic) in **Cursor**, deployed through **Android Studio**.
 
 <br>
@@ -263,7 +288,6 @@ Output: `app/build/outputs/apk/debug/app-debug.apk`
 ## 📄 License
 
 Personal project · Not for commercial distribution.
-
 **KosherJava** is used under its LGPL license.
 
 <br>
@@ -272,6 +296,6 @@ Personal project · Not for commercial distribution.
 
 _Built with ❤️ for Shabbat_
 
-**[⬆ Back to top](#️-שעון-מעורר---לשבת)**
+**[⬆ Back to top](#️-שעון-מעורר--לשבת)**
 
 </div>
