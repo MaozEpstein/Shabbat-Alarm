@@ -128,11 +128,13 @@ No snooze. No dismiss. No lingering notification to swipe away. Just a gentle re
 
 1. Open the `.apk` file on your phone (from Downloads or WhatsApp)
 2. Android will warn "**Untrusted source**" — tap **Settings** → enable **Allow from this source**
-3. Tap **Install**
-4. On first launch, grant:
+3. If **Google Play Protect** shows "Unsafe app blocked" — tap **More details** → **Install anyway**
+   (the app is unsigned by Google, not malicious — you can verify the source on this repo)
+4. Tap **Install**
+5. On first launch, grant:
    - 🔔 **Notifications** — so you see the alarm
    - ⏰ **Exact alarms** — so it fires on time
-5. In **Settings → Apps → Shabbat Alarm → Battery**, disable battery optimization
+6. In **Settings → Apps → Shabbat Alarm → Battery**, disable battery optimization
    (or tap **"Fix now"** on the in-app warning card)
 
 </details>
