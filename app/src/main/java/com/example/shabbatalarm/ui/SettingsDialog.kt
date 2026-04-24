@@ -64,11 +64,13 @@ fun SettingsDialog(
     repeatWeekly: Boolean,
     vibrationEnabled: Boolean,
     currentToneUri: String?,
+    alarmVolume: Float,
     reminderEnabled: Boolean,
     onDurationChange: (Int) -> Unit,
     onRepeatChange: (Boolean) -> Unit,
     onVibrationChange: (Boolean) -> Unit,
     onToneChange: (String?) -> Unit,
+    onVolumeChange: (Float) -> Unit,
     onReminderEnabledChange: (Boolean) -> Unit,
     onShareApp: () -> Unit,
     onDismiss: () -> Unit
@@ -106,7 +108,7 @@ fun SettingsDialog(
             } else {
                 tones = AlarmTones.loadAvailable(context)
                 onToneChange(uri.toString())
-                preview.play(uri)
+                preview.play(uri, alarmVolume)
             }
         }
     }
@@ -130,8 +132,18 @@ fun SettingsDialog(
                     SettingsSubView.SOUND -> AlarmSoundPickerView(
                         tones = tones,
                         selectedUri = effectiveSelectedUri,
+                        alarmVolume = alarmVolume,
+                        onVolumeChange = { newVolume ->
+                            onVolumeChange(newVolume)
+                            if (preview.isPlaying()) {
+                                preview.setVolume(newVolume)
+                            } else {
+                                val uri = effectiveSelectedUri?.let { Uri.parse(it) }
+                                if (uri != null) preview.play(uri, newVolume)
+                            }
+                        },
                         onSelect = { tone ->
-                            preview.play(tone.uri)
+                            preview.play(tone.uri, alarmVolume)
                             onToneChange(tone.uri.toString())
                         },
                         onAddCustomClick = {
@@ -358,6 +370,8 @@ private fun NavigationRow(
 private fun AlarmSoundPickerView(
     tones: List<AlarmTone>,
     selectedUri: String?,
+    alarmVolume: Float,
+    onVolumeChange: (Float) -> Unit,
     onSelect: (AlarmTone) -> Unit,
     onAddCustomClick: () -> Unit,
     onRemoveCustom: (AlarmTone) -> Unit,
@@ -387,6 +401,24 @@ private fun AlarmSoundPickerView(
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
     Spacer(modifier = Modifier.height(12.dp))
+
+    Text(
+        text = stringResource(
+            R.string.settings_alarm_volume,
+            (alarmVolume * 100).toInt()
+        ),
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.onSurface
+    )
+    Slider(
+        value = alarmVolume,
+        onValueChange = onVolumeChange,
+        valueRange = AlarmRepository.MIN_ALARM_VOLUME..1f,
+        modifier = Modifier.fillMaxWidth()
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+    Spacer(modifier = Modifier.height(8.dp))
 
     Column(
         modifier = Modifier

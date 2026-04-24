@@ -216,6 +216,18 @@ class AlarmRepository(context: Context) {
         prefs.edit().putBoolean(KEY_VIBRATION, enabled).apply()
     }
 
+    /** Alarm playback volume in [MIN_ALARM_VOLUME, 1.0]. Acts as the ceiling for
+     *  the fade-in ramp inside AlarmService and the preview volume in the UI. */
+    fun getAlarmVolume(): Float =
+        prefs.getFloat(KEY_ALARM_VOLUME, DEFAULT_ALARM_VOLUME)
+            .coerceIn(MIN_ALARM_VOLUME, 1f)
+
+    fun setAlarmVolume(volume: Float) {
+        prefs.edit()
+            .putFloat(KEY_ALARM_VOLUME, volume.coerceIn(MIN_ALARM_VOLUME, 1f))
+            .apply()
+    }
+
     // ── Pre-Shabbat reminder settings ──────────────────────────────────────
 
     fun getPreShabbatReminderEnabled(): Boolean =
@@ -246,8 +258,12 @@ class AlarmRepository(context: Context) {
         private const val KEY_REPEAT_WEEKLY = "repeat_weekly"
         private const val KEY_ALARM_TONE_URI = "alarm_tone_uri"
         private const val KEY_VIBRATION = "vibration_enabled"
+        private const val KEY_ALARM_VOLUME = "alarm_volume"
         private const val KEY_REMINDER_ENABLED = "pre_shabbat_reminder_enabled"
         private const val KEY_DEFAULT_CITY_INDEX = "default_city_index"
+
+        const val DEFAULT_ALARM_VOLUME = 1.0f
+        const val MIN_ALARM_VOLUME = 0.1f
 
         const val DEFAULT_DURATION_SECONDS = 15
         const val MIN_DURATION_SECONDS = 5

@@ -97,6 +97,7 @@ fun AlarmScreen(modifier: Modifier = Modifier) {
     var repeatWeekly by rememberSaveable { mutableStateOf(repository.getRepeatWeekly()) }
     var vibrationEnabled by rememberSaveable { mutableStateOf(repository.getVibrationEnabled()) }
     var alarmToneUri by rememberSaveable { mutableStateOf(repository.getAlarmToneUri()) }
+    var alarmVolume by rememberSaveable { mutableStateOf(repository.getAlarmVolume()) }
     var reminderEnabled by rememberSaveable { mutableStateOf(repository.getPreShabbatReminderEnabled()) }
     var defaultCityIndex by rememberSaveable { mutableStateOf(repository.getDefaultCityIndex()) }
 
@@ -303,6 +304,7 @@ fun AlarmScreen(modifier: Modifier = Modifier) {
             repeatWeekly = repeatWeekly,
             vibrationEnabled = vibrationEnabled,
             currentToneUri = alarmToneUri,
+            alarmVolume = alarmVolume,
             reminderEnabled = reminderEnabled,
             onDurationChange = {
                 durationSeconds = it
@@ -319,6 +321,10 @@ fun AlarmScreen(modifier: Modifier = Modifier) {
             onToneChange = {
                 alarmToneUri = it
                 repository.setAlarmToneUri(it)
+            },
+            onVolumeChange = {
+                alarmVolume = it
+                repository.setAlarmVolume(it)
             },
             onReminderEnabledChange = {
                 reminderEnabled = it

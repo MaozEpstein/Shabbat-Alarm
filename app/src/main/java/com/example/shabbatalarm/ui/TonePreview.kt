@@ -23,9 +23,14 @@ class TonePreview(
     private var player: MediaPlayer? = null
     private var stopJob: Job? = null
 
-    fun play(uri: Uri, previewDurationMs: Long = DEFAULT_PREVIEW_MS) {
+    fun play(
+        uri: Uri,
+        volume: Float = 1f,
+        previewDurationMs: Long = DEFAULT_PREVIEW_MS
+    ) {
         release()
         try {
+            val v = volume.coerceIn(0f, 1f)
             player = MediaPlayer().apply {
                 setAudioAttributes(
                     AudioAttributes.Builder()
@@ -36,6 +41,7 @@ class TonePreview(
                 setDataSource(context, uri)
                 isLooping = true
                 prepare()
+                setVolume(v, v)
                 start()
             }
             stopJob = scope.launch {
@@ -47,6 +53,14 @@ class TonePreview(
             release()
         }
     }
+
+    /** Updates the volume of the currently-playing preview, if any. */
+    fun setVolume(volume: Float) {
+        val v = volume.coerceIn(0f, 1f)
+        player?.let { runCatching { it.setVolume(v, v) } }
+    }
+
+    fun isPlaying(): Boolean = player?.let { runCatching { it.isPlaying }.getOrDefault(false) } ?: false
 
     fun release() {
         stopJob?.cancel()

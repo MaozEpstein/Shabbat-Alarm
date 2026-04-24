@@ -86,10 +86,12 @@ class AlarmService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun startPlayback() {
-        val storedToneUri = AlarmRepository(this).getAlarmToneUri()?.let { Uri.parse(it) }
+        val repo = AlarmRepository(this)
+        val storedToneUri = repo.getAlarmToneUri()?.let { Uri.parse(it) }
         val toneUri: Uri = storedToneUri
             ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
             ?: Settings.System.DEFAULT_ALARM_ALERT_URI
+        val userVolume = repo.getAlarmVolume()
 
         mediaPlayer = MediaPlayer().apply {
             setAudioAttributes(
@@ -107,10 +109,11 @@ class AlarmService : Service() {
             try {
                 setDataSource(this@AlarmService, toneUri)
                 prepare()
-                setVolume(FADE_START_VOLUME, FADE_START_VOLUME)
+                val startVol = (FADE_START_VOLUME * userVolume).coerceAtMost(userVolume)
+                setVolume(startVol, startVol)
                 start()
-                Log.d(TAG, "Playback started on ALARM stream (fade-in enabled)")
-                scheduleFadeIn()
+                Log.d(TAG, "Playback started on ALARM stream (fade-in enabled, ceiling=$userVolume)")
+                scheduleFadeIn(userVolume)
             } catch (t: Throwable) {
                 Log.e(TAG, "Playback failed for $toneUri — trying system default", t)
                 val fallbackUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
@@ -126,7 +129,7 @@ class AlarmService : Service() {
                     isLooping = true
                     setDataSource(this@AlarmService, fallbackUri)
                     prepare()
-                    setVolume(1f, 1f)
+                    setVolume(userVolume, userVolume)
                     start()
                     Log.d(TAG, "Fallback playback (system default) started")
                 } catch (t2: Throwable) {
@@ -151,19 +154,20 @@ class AlarmService : Service() {
      * Ramps MediaPlayer volume from [FADE_START_VOLUME] up to 1.0 over a short window.
      * For very short alarms (<6s) we skip the fade-in and play at full volume from the start.
      */
-    private fun scheduleFadeIn() {
+    private fun scheduleFadeIn(ceiling: Float) {
         val durationMs = AlarmRepository(this).getDurationSeconds() * 1_000L
         if (durationMs < 6_000L) {
-            mediaPlayer?.setVolume(1f, 1f)
+            mediaPlayer?.setVolume(ceiling, ceiling)
             return
         }
+        val startVol = (FADE_START_VOLUME * ceiling).coerceAtMost(ceiling)
         val fadeInMs = minOf(MAX_FADE_IN_MS, (durationMs * 0.3).toLong())
         val steps = 20
         val stepDelay = fadeInMs / steps
         serviceScope.launch {
             for (i in 1..steps) {
                 val progress = i.toFloat() / steps
-                val volume = FADE_START_VOLUME + (1f - FADE_START_VOLUME) * progress
+                val volume = startVol + (ceiling - startVol) * progress
                 mediaPlayer?.setVolume(volume, volume)
                 delay(stepDelay)
             }
