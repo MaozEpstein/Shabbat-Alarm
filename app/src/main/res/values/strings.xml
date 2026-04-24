@@ -99,7 +99,8 @@
 
     <!-- Share APK -->
     <string name="settings_share_app">שתף את האפליקציה</string>
-    <string name="settings_share_app_desc">שלח את קובץ ההתקנה לחברים</string>
+    <string name="settings_share_app_desc">שלח לחברים לינק להורדה</string>
     <string name="share_chooser_title">שתף דרך…</string>
-    <string name="share_app_failed">לא הצלחנו להכין את קובץ ההתקנה</string>
+    <string name="share_app_failed">לא הצלחנו לפתוח את חלון השיתוף</string>
+    <string name="share_app_message">בוא תתקין את השעון המעורר לשבת 🕯️\n%1$s</string>
 </resources>
