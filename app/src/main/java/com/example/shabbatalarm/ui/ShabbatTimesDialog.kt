@@ -49,8 +49,9 @@ import androidx.compose.ui.window.Dialog
 import com.example.shabbatalarm.R
 import com.example.shabbatalarm.alarm.AdvancedZmanim
 import com.example.shabbatalarm.alarm.AlarmRepository
-import com.example.shabbatalarm.alarm.DvarTorah
+import com.example.shabbatalarm.alarm.DvarTorahEntry
 import com.example.shabbatalarm.alarm.IsraeliCity
+import com.example.shabbatalarm.alarm.ParshaRepository
 import com.example.shabbatalarm.alarm.ShabbatTimesCalculator
 
 @Composable
@@ -362,33 +363,39 @@ private fun AdvancedZmanimContent(
 }
 
 /**
- * Tab body for the user-written Dvar Torah. Three states:
- *  - **Empty**: no entry saved → CTA to write one.
- *  - **Stale**: an entry exists but its fridayKey is older than the upcoming
- *    Friday → small banner suggesting to refresh; old text still readable.
- *  - **Fresh**: entry matches upcoming Friday → straight readout.
+ * Tab body for the upcoming Shabbat's dvar torah.
  *
- *  In all states, an edit / write button toggles into a textfield + save flow.
- *  The entry is saved against the *upcoming* Friday's key, so tapping save
- *  during a stale state implicitly "rolls forward" the entry to this week.
+ * Two display sources, in priority:
+ *  1. **User override** — if the user saved custom text whose fridayKey
+ *     matches the upcoming Friday, that text is shown as-is.
+ *  2. **Bundled catalog** — otherwise, the parsha for the upcoming Shabbat
+ *     is resolved via KosherJava and the matching entry from
+ *     `assets/parshiyot.json` is rendered (title + pasuk + body).
+ *
+ *  Tapping the edit pencil opens an editor pre-loaded with whatever is
+ *  currently displayed, so customizing the bundled content is one step.
+ *  When a user override is in effect, a "reset to default" button appears
+ *  to delete the override and fall back to the catalog.
  */
 @Composable
 private fun DvarTorahContent(fridayLabel: String) {
     val context = LocalContext.current
     val repo = remember { AlarmRepository(context) }
     val upcomingKey = remember { ShabbatTimesCalculator.upcomingFridayKey() }
+    val repoEntry = remember { ParshaRepository.findForUpcomingShabbat(context) }
 
     var saved by remember { mutableStateOf(repo.getDvarTorah()) }
     var editing by rememberSaveable { mutableStateOf(false) }
     var draft by rememberSaveable { mutableStateOf("") }
-    var showClearConfirm by rememberSaveable { mutableStateOf(false) }
+    var showResetConfirm by rememberSaveable { mutableStateOf(false) }
 
-    val isStale = saved != null && saved!!.fridayKey != upcomingKey
+    // Only honor the saved override when its Friday matches this week.
+    val freshUserText = saved?.takeIf { it.fridayKey == upcomingKey }?.text
 
     Column(
         modifier = Modifier.heightIn(min = 200.dp, max = 460.dp)
     ) {
-        // Header: "לשבת <date>" with edit / write button on the trailing side.
+        // Header: "לשבת <date>" with edit pencil on the trailing side.
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -401,37 +408,15 @@ private fun DvarTorahContent(fridayLabel: String) {
             )
             if (!editing) {
                 IconButton(onClick = {
-                    draft = saved?.text.orEmpty()
+                    draft = freshUserText ?: repoEntry?.body.orEmpty()
                     editing = true
                 }) {
                     Icon(
                         imageVector = Icons.Filled.Edit,
-                        contentDescription = stringResource(
-                            if (saved == null) R.string.dvar_torah_write
-                            else R.string.dvar_torah_edit
-                        ),
+                        contentDescription = stringResource(R.string.dvar_torah_edit),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
-            }
-        }
-
-        if (isStale && !editing) {
-            Spacer(modifier = Modifier.height(6.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.tertiaryContainer,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.dvar_torah_stale_banner),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer
-                )
             }
         }
 
@@ -453,31 +438,32 @@ private fun DvarTorahContent(fridayLabel: String) {
             )
         } else {
             DvarTorahReadout(
-                saved = saved,
+                userText = freshUserText,
+                repoEntry = repoEntry,
                 onWrite = {
-                    draft = ""
+                    draft = freshUserText ?: repoEntry?.body.orEmpty()
                     editing = true
                 },
-                onClearRequest = { showClearConfirm = true }
+                onResetToDefault = { showResetConfirm = true }
             )
         }
     }
 
-    if (showClearConfirm) {
+    if (showResetConfirm) {
         AlertDialog(
-            onDismissRequest = { showClearConfirm = false },
-            text = { Text(stringResource(R.string.dvar_torah_clear_confirm)) },
+            onDismissRequest = { showResetConfirm = false },
+            text = { Text(stringResource(R.string.dvar_torah_reset_confirm)) },
             confirmButton = {
                 TextButton(onClick = {
                     repo.clearDvarTorah()
                     saved = null
-                    showClearConfirm = false
+                    showResetConfirm = false
                 }) {
-                    Text(stringResource(R.string.dvar_torah_clear))
+                    Text(stringResource(R.string.dvar_torah_reset))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showClearConfirm = false }) {
+                TextButton(onClick = { showResetConfirm = false }) {
                     Text(stringResource(R.string.dvar_torah_cancel))
                 }
             }
@@ -487,12 +473,15 @@ private fun DvarTorahContent(fridayLabel: String) {
 
 @Composable
 private fun DvarTorahReadout(
-    saved: DvarTorah?,
+    userText: String?,
+    repoEntry: DvarTorahEntry?,
     onWrite: () -> Unit,
-    onClearRequest: () -> Unit
+    onResetToDefault: () -> Unit
 ) {
-    if (saved == null) {
-        // Empty state.
+    // No content of any kind — extremely rare (catalog failed to load and
+    // user has no override). Surface the original empty state so the user
+    // can still write something.
+    if (userText == null && repoEntry == null) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -524,19 +513,58 @@ private fun DvarTorahReadout(
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
     ) {
-        Text(
-            text = saved.text,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-            TextButton(onClick = onClearRequest) {
+        if (userText != null) {
+            // User override is showing — just the text + a reset action.
+            Text(
+                text = userText,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                TextButton(onClick = onResetToDefault) {
+                    Text(stringResource(R.string.dvar_torah_reset))
+                }
+            }
+        } else if (repoEntry != null) {
+            // Bundled catalog entry — render parsha header, opening pasuk,
+            // body, and the "AI authored" footer.
+            Text(
+                text = repoEntry.nameHe,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.tertiary,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = repoEntry.title,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold
+            )
+            if (repoEntry.pasukRef.isNotBlank()) {
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = stringResource(R.string.dvar_torah_clear),
-                    color = MaterialTheme.colorScheme.error
+                    text = repoEntry.pasukRef,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = repoEntry.body,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = stringResource(R.string.dvar_torah_ai_attribution),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

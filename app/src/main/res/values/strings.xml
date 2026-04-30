@@ -54,14 +54,14 @@
     <string name="dvar_torah_for_friday">לשבת %1$s</string>
     <string name="dvar_torah_empty_title">אין דבר תורה לשבת הקרובה</string>
     <string name="dvar_torah_empty_subtitle">לחץ על "כתוב" והדבק דבר תורה שיהיה מוכן עד מוצ\"ש.</string>
-    <string name="dvar_torah_stale_banner">דבר התורה השמור הוא משבת שעברה. ערוך אותו לשבת הקרובה.</string>
     <string name="dvar_torah_write">כתוב</string>
     <string name="dvar_torah_edit">ערוך</string>
     <string name="dvar_torah_save">שמור</string>
     <string name="dvar_torah_cancel">בטל</string>
-    <string name="dvar_torah_clear">מחק</string>
-    <string name="dvar_torah_clear_confirm">למחוק את דבר התורה השמור?</string>
+    <string name="dvar_torah_reset">החזר לברירת מחדל</string>
+    <string name="dvar_torah_reset_confirm">למחוק את הטקסט שכתבת ולחזור לדבר התורה הדיפולטי?</string>
     <string name="dvar_torah_placeholder">הדבק כאן דבר תורה — מספר, אתר, או כתוב משלך…</string>
+    <string name="dvar_torah_ai_attribution">דבר תורה זה נכתב בעזרת בינה מלאכותית.</string>
     <string name="zmanim_city_note">לחץ על שם העיר להחלפה</string>
     <string name="zmanim_sof_zman_shma">סוף זמן קריאת שמע</string>
     <string name="zmanim_sof_zman_tfila">סוף זמן תפילה</string>
