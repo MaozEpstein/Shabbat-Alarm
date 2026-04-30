@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -407,6 +408,23 @@ private fun DvarTorahContent(fridayLabel: String) {
                 modifier = Modifier.weight(1f)
             )
             if (!editing) {
+                val canShare = freshUserText != null || repoEntry != null
+                if (canShare) {
+                    IconButton(onClick = {
+                        DvarTorahSharer.share(
+                            context = context,
+                            fridayLabel = fridayLabel,
+                            userText = freshUserText,
+                            repoEntry = repoEntry
+                        )
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Share,
+                            contentDescription = stringResource(R.string.dvar_torah_share),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
                 IconButton(onClick = {
                     draft = freshUserText ?: repoEntry?.body.orEmpty()
                     editing = true

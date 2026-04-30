@@ -62,6 +62,11 @@
     <string name="dvar_torah_reset_confirm">למחוק את הטקסט שכתבת ולחזור לדבר התורה הדיפולטי?</string>
     <string name="dvar_torah_placeholder">הדבק כאן דבר תורה — מספר, אתר, או כתוב משלך…</string>
     <string name="dvar_torah_ai_attribution">דבר תורה זה נכתב בעזרת בינה מלאכותית.</string>
+    <string name="dvar_torah_share">שתף דבר תורה</string>
+    <string name="dvar_torah_share_chooser">שתף דבר תורה דרך…</string>
+    <string name="dvar_torah_share_subject">דבר תורה לשבת</string>
+    <string name="dvar_torah_share_header_parsha">🕯 דבר תורה לפרשת %1$s</string>
+    <string name="dvar_torah_share_header_user">🕯 דבר תורה לשבת %1$s</string>
     <string name="zmanim_city_note">לחץ על שם העיר להחלפה</string>
     <string name="zmanim_sof_zman_shma">סוף זמן קריאת שמע</string>
     <string name="zmanim_sof_zman_tfila">סוף זמן תפילה</string>
