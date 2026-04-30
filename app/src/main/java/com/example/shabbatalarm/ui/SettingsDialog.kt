@@ -66,12 +66,14 @@ fun SettingsDialog(
     currentToneUri: String?,
     alarmVolume: Float,
     reminderEnabled: Boolean,
+    reminderOffsetMinutes: Int,
     onDurationChange: (Int) -> Unit,
     onRepeatChange: (Boolean) -> Unit,
     onVibrationChange: (Boolean) -> Unit,
     onToneChange: (String?) -> Unit,
     onVolumeChange: (Float) -> Unit,
     onReminderEnabledChange: (Boolean) -> Unit,
+    onEditReminder: () -> Unit,
     onShareApp: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -174,7 +176,9 @@ fun SettingsDialog(
                     )
                     SettingsSubView.REMINDER -> ReminderPickerView(
                         enabled = reminderEnabled,
+                        offsetMinutes = reminderOffsetMinutes,
                         onEnabledChange = onReminderEnabledChange,
+                        onEdit = onEditReminder,
                         onBack = { subView = SettingsSubView.MAIN },
                         onDismiss = onDismiss
                     )
@@ -184,6 +188,7 @@ fun SettingsDialog(
                         vibrationEnabled = vibrationEnabled,
                         currentToneTitle = currentToneTitle,
                         reminderEnabled = reminderEnabled,
+                        reminderOffsetMinutes = reminderOffsetMinutes,
                         onDurationChange = onDurationChange,
                         onRepeatChange = onRepeatChange,
                         onVibrationChange = onVibrationChange,
@@ -205,6 +210,7 @@ private fun MainSettingsView(
     vibrationEnabled: Boolean,
     currentToneTitle: String,
     reminderEnabled: Boolean,
+    reminderOffsetMinutes: Int,
     onDurationChange: (Int) -> Unit,
     onRepeatChange: (Boolean) -> Unit,
     onVibrationChange: (Boolean) -> Unit,
@@ -299,7 +305,7 @@ private fun MainSettingsView(
 
     // ── Pre-Shabbat reminder (opens sub-view) ──────────────────────────────
     val reminderSubtitle = if (reminderEnabled) {
-        stringResource(R.string.settings_reminder_enabled_label)
+        stringResource(R.string.settings_reminder_enabled_label, reminderOffsetMinutes)
     } else {
         stringResource(R.string.settings_reminder_disabled)
     }
@@ -500,7 +506,9 @@ private fun queryDisplayName(context: android.content.Context, uri: Uri): String
 @Composable
 private fun ReminderPickerView(
     enabled: Boolean,
+    offsetMinutes: Int,
     onEnabledChange: (Boolean) -> Unit,
+    onEdit: () -> Unit,
     onBack: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -522,13 +530,13 @@ private fun ReminderPickerView(
 
     Spacer(modifier = Modifier.height(8.dp))
     Text(
-        text = stringResource(R.string.settings_reminder_desc),
+        text = stringResource(R.string.settings_reminder_desc, offsetMinutes),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
     Spacer(modifier = Modifier.height(20.dp))
 
-    // Enable switch only — city is fixed to Jerusalem.
+    // Enable switch — city is fixed to Jerusalem.
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -541,6 +549,17 @@ private fun ReminderPickerView(
         )
         Switch(checked = enabled, onCheckedChange = onEnabledChange)
     }
+
+    Spacer(modifier = Modifier.height(8.dp))
+    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+    Spacer(modifier = Modifier.height(8.dp))
+
+    // Edit reminder text + offset (full-screen editor).
+    NavigationRow(
+        title = stringResource(R.string.settings_reminder_edit),
+        subtitle = stringResource(R.string.settings_reminder_edit_desc),
+        onClick = onEdit
+    )
 
     Spacer(modifier = Modifier.height(16.dp))
 

@@ -12,8 +12,8 @@ android {
         applicationId = "com.example.shabbatalarm"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 4
+        versionName = "0.4.0"
 
         vectorDrawables {
             useSupportLibrary = true

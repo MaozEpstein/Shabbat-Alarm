@@ -7,11 +7,16 @@ import android.content.Intent
 import android.util.Log
 
 /**
- * Schedules a weekly reminder that fires 40 minutes before candle lighting in
- * Jerusalem. That gives roughly 40 minutes' heads-up to Jerusalem residents and
- * roughly an hour to the rest of the country (since most cities light candles
- * ~22 minutes later than Jerusalem). When the reminder fires (see
- * [ShabbatReminderReceiver]) it also re-arms itself for the next week.
+ * Schedules the next pre-Shabbat / pre-Yom Tov reminder. Fires N minutes before
+ * Jerusalem candle lighting for whichever holy day comes first (Shabbat OR
+ * Yom Tov). N is user-configurable via [AlarmRepository.getPreShabbatReminderOffsetMinutes].
+ *
+ * Anchoring to Jerusalem gives the rest of the country an extra ~22-minute buffer,
+ * since most Israeli cities light candles ~22 minutes later than Jerusalem.
+ *
+ * When the reminder fires (see [ShabbatReminderReceiver]) it re-arms itself for
+ * the next holy day — so a single PendingIntent covers an arbitrary mix of
+ * Shabbatot and Yom Tov entries.
  */
 class ShabbatReminderScheduler(private val context: Context) {
 
@@ -34,16 +39,17 @@ class ShabbatReminderScheduler(private val context: Context) {
         val city = ShabbatTimesCalculator.CITIES.firstOrNull { it.nameEn == "Jerusalem" }
             ?: ShabbatTimesCalculator.CITIES[0]
 
-        val candleLighting = ShabbatTimesCalculator.computeNextCandleLighting(city)
-        if (candleLighting == null) {
-            Log.e(TAG, "Could not compute candle lighting for ${city.nameEn}")
+        val target = ShabbatTimesCalculator.computeNextKedushaTarget(city)
+        if (target == null) {
+            Log.e(TAG, "Could not compute next kedusha target for ${city.nameEn}")
             return
         }
 
-        val triggerAt = candleLighting.time - REMINDER_OFFSET_MS
+        val offsetMs = repo.getPreShabbatReminderOffsetMinutes() * 60_000L
+        val triggerAt = target.candleLighting.time - offsetMs
         if (triggerAt <= System.currentTimeMillis()) {
-            // The reminder for this Friday has already passed; KosherJava has
-            // rolled to next week in computeNextCandleLighting — but double-guard.
+            // computeNextKedushaTarget already filters past entries, but
+            // double-guard against the (offset > distance-to-entry) case.
             Log.d(TAG, "Reminder time $triggerAt is in the past; skipping")
             return
         }
@@ -53,7 +59,7 @@ class ShabbatReminderScheduler(private val context: Context) {
             triggerAt,
             buildPendingIntent()
         )
-        Log.d(TAG, "Reminder scheduled for $triggerAt (${city.nameHe})")
+        Log.d(TAG, "Reminder scheduled for $triggerAt (${target.kind} in ${city.nameHe})")
     }
 
     fun cancel() {
@@ -75,7 +81,6 @@ class ShabbatReminderScheduler(private val context: Context) {
     companion object {
         private const val TAG = "ShabbatReminder"
         private const val REQUEST_CODE = 2001
-        private const val REMINDER_OFFSET_MS = 40 * 60 * 1_000L // 40 minutes before Jerusalem candle lighting
         const val ACTION_FIRE = "com.example.shabbatalarm.ACTION_REMINDER_FIRE"
     }
 }

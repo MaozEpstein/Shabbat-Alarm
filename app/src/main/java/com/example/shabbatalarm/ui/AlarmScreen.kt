@@ -92,6 +92,7 @@ fun AlarmScreen(modifier: Modifier = Modifier) {
     var alarms by remember { mutableStateOf(repository.getActiveAlarms()) }
     var showShabbatTimes by rememberSaveable { mutableStateOf(false) }
     var showSettings by rememberSaveable { mutableStateOf(false) }
+    var showReminderEditor by rememberSaveable { mutableStateOf(false) }
     var durationSeconds by rememberSaveable { mutableStateOf(repository.getDurationSeconds()) }
     var isBatteryOptimized by rememberSaveable { mutableStateOf(false) }
     var repeatWeekly by rememberSaveable { mutableStateOf(repository.getRepeatWeekly()) }
@@ -99,6 +100,8 @@ fun AlarmScreen(modifier: Modifier = Modifier) {
     var alarmToneUri by rememberSaveable { mutableStateOf(repository.getAlarmToneUri()) }
     var alarmVolume by rememberSaveable { mutableStateOf(repository.getAlarmVolume()) }
     var reminderEnabled by rememberSaveable { mutableStateOf(repository.getPreShabbatReminderEnabled()) }
+    var reminderCustomText by rememberSaveable { mutableStateOf(repository.getPreShabbatReminderText()) }
+    var reminderOffsetMinutes by rememberSaveable { mutableStateOf(repository.getPreShabbatReminderOffsetMinutes()) }
     var defaultCityIndex by rememberSaveable { mutableStateOf(repository.getDefaultCityIndex()) }
 
     val tomorrowSuffix = stringResource(R.string.tomorrow_suffix)
@@ -306,6 +309,7 @@ fun AlarmScreen(modifier: Modifier = Modifier) {
             currentToneUri = alarmToneUri,
             alarmVolume = alarmVolume,
             reminderEnabled = reminderEnabled,
+            reminderOffsetMinutes = reminderOffsetMinutes,
             onDurationChange = {
                 durationSeconds = it
                 repository.setDurationSeconds(it)
@@ -331,8 +335,29 @@ fun AlarmScreen(modifier: Modifier = Modifier) {
                 repository.setPreShabbatReminderEnabled(it)
                 if (it) reminderScheduler.scheduleNext() else reminderScheduler.cancel()
             },
+            onEditReminder = {
+                showSettings = false
+                showReminderEditor = true
+            },
             onShareApp = { ApkSharer.share(context, shareScope) },
             onDismiss = { showSettings = false }
+        )
+    }
+
+    if (showReminderEditor) {
+        ReminderEditorScreen(
+            initialCustomText = reminderCustomText,
+            initialOffsetMinutes = reminderOffsetMinutes,
+            onSave = { newText, newOffset ->
+                reminderCustomText = newText
+                reminderOffsetMinutes = newOffset
+                repository.setPreShabbatReminderText(newText)
+                repository.setPreShabbatReminderOffsetMinutes(newOffset)
+                // Re-arm so the offset change takes effect this week.
+                if (reminderEnabled) reminderScheduler.scheduleNext()
+                showReminderEditor = false
+            },
+            onCancel = { showReminderEditor = false }
         )
     }
 }

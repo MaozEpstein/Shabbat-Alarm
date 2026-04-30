@@ -21,6 +21,16 @@ data class CustomTone(
 )
 
 /**
+ * A user-written Torah note, anchored to a specific Friday so the app can
+ * tell whether it's still relevant ("for the upcoming Shabbat") or stale.
+ */
+data class DvarTorah(
+    val text: String,
+    /** Upcoming Friday this entry was written for, formatted yyyy-MM-dd in Asia/Jerusalem. */
+    val fridayKey: String
+)
+
+/**
  * Persists:
  *  - a LIST of scheduled alarms
  *  - global playback settings (duration, vibration, tone, reminder-on, city-index)
@@ -243,6 +253,67 @@ class AlarmRepository(context: Context) {
         prefs.edit().putInt(KEY_DEFAULT_CITY_INDEX, index).apply()
     }
 
+    /** Custom text for the pre-Shabbat reminder notification. null = use the
+     *  default string resource (which is parameterized with the current offset). */
+    fun getPreShabbatReminderText(): String? =
+        prefs.getString(KEY_REMINDER_TEXT, null)?.takeIf { it.isNotBlank() }
+
+    fun setPreShabbatReminderText(text: String?) {
+        val cleaned = text?.trim().orEmpty()
+        prefs.edit().apply {
+            if (cleaned.isEmpty()) remove(KEY_REMINDER_TEXT) else putString(KEY_REMINDER_TEXT, cleaned)
+        }.apply()
+    }
+
+    // ── Dvar Torah ─────────────────────────────────────────────────────────
+
+    /** Returns the stored Dvar Torah, or null if none has been saved. The
+     *  caller is responsible for checking [DvarTorah.fridayKey] against the
+     *  upcoming Friday to decide whether the entry is still relevant. */
+    fun getDvarTorah(): DvarTorah? {
+        val raw = prefs.getString(KEY_DVAR_TORAH_JSON, null) ?: return null
+        return try {
+            val obj = JSONObject(raw)
+            DvarTorah(
+                text = obj.getString("text"),
+                fridayKey = obj.getString("fridayKey")
+            ).takeIf { it.text.isNotBlank() }
+        } catch (t: Throwable) {
+            null
+        }
+    }
+
+    fun setDvarTorah(text: String, fridayKey: String) {
+        val cleaned = text.trim()
+        if (cleaned.isEmpty()) {
+            prefs.edit().remove(KEY_DVAR_TORAH_JSON).apply()
+            return
+        }
+        val obj = JSONObject().apply {
+            put("text", cleaned)
+            put("fridayKey", fridayKey)
+        }
+        prefs.edit().putString(KEY_DVAR_TORAH_JSON, obj.toString()).apply()
+    }
+
+    fun clearDvarTorah() {
+        prefs.edit().remove(KEY_DVAR_TORAH_JSON).apply()
+    }
+
+    /** Minutes before Jerusalem candle lighting that the reminder fires. */
+    fun getPreShabbatReminderOffsetMinutes(): Int =
+        prefs.getInt(KEY_REMINDER_OFFSET_MINUTES, DEFAULT_REMINDER_OFFSET_MINUTES)
+            .coerceIn(MIN_REMINDER_OFFSET_MINUTES, MAX_REMINDER_OFFSET_MINUTES)
+
+    fun setPreShabbatReminderOffsetMinutes(minutes: Int) {
+        prefs.edit()
+            .putInt(
+                KEY_REMINDER_OFFSET_MINUTES,
+                minutes.coerceIn(MIN_REMINDER_OFFSET_MINUTES, MAX_REMINDER_OFFSET_MINUTES)
+            )
+            .apply()
+    }
+
     companion object {
         private const val PREFS_NAME = "shabbat_alarm_prefs"
 
@@ -260,7 +331,15 @@ class AlarmRepository(context: Context) {
         private const val KEY_VIBRATION = "vibration_enabled"
         private const val KEY_ALARM_VOLUME = "alarm_volume"
         private const val KEY_REMINDER_ENABLED = "pre_shabbat_reminder_enabled"
+        private const val KEY_REMINDER_TEXT = "pre_shabbat_reminder_text"
+        private const val KEY_REMINDER_OFFSET_MINUTES = "pre_shabbat_reminder_offset_minutes"
         private const val KEY_DEFAULT_CITY_INDEX = "default_city_index"
+        private const val KEY_DVAR_TORAH_JSON = "dvar_torah_json"
+
+        const val DEFAULT_REMINDER_OFFSET_MINUTES = 40
+        const val MIN_REMINDER_OFFSET_MINUTES = 15
+        const val MAX_REMINDER_OFFSET_MINUTES = 180
+        const val REMINDER_OFFSET_STEP_MINUTES = 5
 
         const val DEFAULT_ALARM_VOLUME = 1.0f
         const val MIN_ALARM_VOLUME = 0.1f

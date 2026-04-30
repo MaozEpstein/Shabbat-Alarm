@@ -48,6 +48,20 @@
     <!-- Advanced zmanim tab -->
     <string name="shabbat_tab_times">כניסה ויציאה</string>
     <string name="shabbat_tab_zmanim">זמנים נוספים</string>
+    <string name="shabbat_tab_dvar_torah">דבר תורה</string>
+
+    <!-- Dvar Torah tab -->
+    <string name="dvar_torah_for_friday">לשבת %1$s</string>
+    <string name="dvar_torah_empty_title">אין דבר תורה לשבת הקרובה</string>
+    <string name="dvar_torah_empty_subtitle">לחץ על "כתוב" והדבק דבר תורה שיהיה מוכן עד מוצ\"ש.</string>
+    <string name="dvar_torah_stale_banner">דבר התורה השמור הוא משבת שעברה. ערוך אותו לשבת הקרובה.</string>
+    <string name="dvar_torah_write">כתוב</string>
+    <string name="dvar_torah_edit">ערוך</string>
+    <string name="dvar_torah_save">שמור</string>
+    <string name="dvar_torah_cancel">בטל</string>
+    <string name="dvar_torah_clear">מחק</string>
+    <string name="dvar_torah_clear_confirm">למחוק את דבר התורה השמור?</string>
+    <string name="dvar_torah_placeholder">הדבק כאן דבר תורה — מספר, אתר, או כתוב משלך…</string>
     <string name="zmanim_city_note">לחץ על שם העיר להחלפה</string>
     <string name="zmanim_sof_zman_shma">סוף זמן קריאת שמע</string>
     <string name="zmanim_sof_zman_tfila">סוף זמן תפילה</string>
@@ -75,16 +89,38 @@
     <string name="settings_vibration">רטט</string>
     <string name="settings_vibration_desc">הפעל רטט בנוסף לצליל.</string>
 
-    <!-- Pre-Shabbat reminder (30 min before candle lighting) -->
-    <string name="settings_reminder">תזכורת שבת</string>
-    <string name="settings_reminder_desc">התראה כ-40 דקות לפני כניסת שבת בירושלים</string>
+    <!-- Pre-Shabbat / pre-Yom Tov reminder (configurable minutes before candle lighting) -->
+    <string name="settings_reminder">תזכורת שבת וחג</string>
+    <string name="settings_reminder_desc">התראה כ-%1$d דקות לפני כניסת שבת או חג בירושלים</string>
     <string name="settings_reminder_enable">הפעל תזכורת</string>
     <string name="settings_reminder_disabled">כבוי</string>
-    <string name="settings_reminder_enabled_label">פעיל</string>
-    <string name="reminder_channel_name">תזכורת שבת</string>
-    <string name="reminder_channel_description">מזכיר כ-40 דקות לפני כניסת שבת בירושלים</string>
-    <string name="reminder_notification_title">תזכורת שבת</string>
-    <string name="reminder_notification_text">שבת נכנסת בעוד כ-40 דק\' בירושלים וכ-60 דק\' בשאר הארץ — לא לשכוח לכוון שעון מעורר לשבת</string>
+    <string name="settings_reminder_enabled_label">פעיל · %1$d דק\' לפני</string>
+    <string name="reminder_channel_name">תזכורת שבת וחג</string>
+    <string name="reminder_channel_description">מזכיר זמן מה לפני כניסת שבת או חג בירושלים</string>
+
+    <!-- Notification titles per kedusha kind -->
+    <string name="reminder_notification_title_shabbat">תזכורת שבת</string>
+    <string name="reminder_notification_title_yomtov">תזכורת חג</string>
+    <string name="reminder_notification_title_combined">תזכורת שבת וחג</string>
+
+    <!-- Notification body templates per kedusha kind. Used when the user has
+         not customized the reminder text. %1$d = minutes-before from settings. -->
+    <string name="reminder_notification_text">שבת נכנסת בעוד כ-%1$d דק\' בירושלים — לא לשכוח לכוון שעון מעורר לשבת</string>
+    <string name="reminder_notification_text_yomtov">החג נכנס בעוד כ-%1$d דק\' בירושלים — לא לשכוח לכוון שעון מעורר לחג</string>
+    <string name="reminder_notification_text_combined">שבת והחג נכנסים בעוד כ-%1$d דק\' בירושלים — לא לשכוח לכוון שעון מעורר</string>
+
+    <!-- Reminder editor (full-screen) -->
+    <string name="settings_reminder_edit">ערוך הודעה וזמן</string>
+    <string name="settings_reminder_edit_desc">שנה את טקסט ההתראה ואת הזמן שלה</string>
+    <string name="reminder_editor_title">עריכת תזכורת שבת/חג</string>
+    <string name="reminder_editor_text_label">טקסט ההתראה</string>
+    <string name="reminder_editor_text_placeholder">לדוגמה: לסדר את השולחן, להדליק נרות, ולהתחבר לשבת</string>
+    <string name="reminder_editor_offset_label">זמן ההתראה: %1$d דקות לפני הכניסה</string>
+    <string name="reminder_editor_offset_help">הזמן נמדד מכניסת שבת או חג בירושלים. שאר הערים מקבלות בערך 22 דק\' תוספת.</string>
+    <string name="reminder_editor_reset_default">החזר טקסט ברירת מחדל</string>
+    <string name="reminder_editor_save">שמור</string>
+    <string name="reminder_editor_preview_title">תצוגה מקדימה</string>
+    <string name="reminder_editor_offset_min_label">%1$d דק\'</string>
 
     <!-- Foreground notification -->
     <string name="notification_title">שעון מעורר - לשבת</string>

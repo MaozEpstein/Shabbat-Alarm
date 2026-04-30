@@ -39,6 +39,19 @@ data class HolidayInfo(
     val combinedWithShabbat: Boolean
 )
 
+/** What kind of holy day a given reminder is for. Drives notification wording. */
+enum class KedushaKind {
+    SHABBAT,
+    YOM_TOV,
+    SHABBAT_YOM_TOV_COMBINED
+}
+
+/** A future candle-lighting moment + the kind of holy day it ushers in. */
+data class NextReminderTarget(
+    val candleLighting: Date,
+    val kind: KedushaKind
+)
+
 /** Advanced zmanim for Shabbat day (Saturday), all as "HH:mm" strings. */
 data class AdvancedZmanim(
     val city: IsraeliCity,
@@ -278,28 +291,61 @@ object ShabbatTimesCalculator {
     }
 
     /**
-     * Returns the next upcoming candle-lighting moment for the given city
-     * (starts from today; if today is past, rolls forward by one week).
+     * Returns the next future candle-lighting for whichever holy day comes
+     * first — Shabbat or Yom Tov — along with the kind of day it is. This is
+     * the entry point used by the pre-Shabbat/Yom Tov reminder.
+     *
+     * Skips kedusha entries whose candle-lighting has already passed (so when
+     * called on Shabbat afternoon it returns NEXT week's Shabbat / next Yom Tov,
+     * not today's, whose entry was yesterday).
      */
-    fun computeNextCandleLighting(city: IsraeliCity): Date? {
-        val now = System.currentTimeMillis()
-        val cal = Calendar.getInstance(TIMEZONE).apply {
+    fun computeNextKedushaTarget(city: IsraeliCity): NextReminderTarget? {
+        val today = Calendar.getInstance(TIMEZONE).apply {
             set(Calendar.HOUR_OF_DAY, 12)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }
-        // Advance to the next Friday (or today if Friday).
-        while (cal.get(Calendar.DAY_OF_WEEK) != Calendar.FRIDAY) {
-            cal.add(Calendar.DAY_OF_MONTH, 1)
-        }
-        // Try up to a year ahead to land on a future candle-lighting.
-        repeat(53) {
-            val lighting = computeCandleLighting(city, cal.time)
-            if (lighting != null && lighting.time > now) return lighting
-            cal.add(Calendar.DAY_OF_MONTH, 7)
+        val now = System.currentTimeMillis()
+
+        // Scan up to 60 days for the next future kedusha entry. 60 covers the
+        // longest realistic gap between consecutive holy days and a defensive
+        // buffer (e.g. a Yom Tov immediately after a Shabbat that's already passed).
+        for (offset in 0..60) {
+            val check = Calendar.getInstance(TIMEZONE).apply {
+                time = today.time
+                add(Calendar.DAY_OF_MONTH, offset)
+            }
+            val (isShabbat, isYomTov) = classifyKedusha(check)
+            if (!isShabbat && !isYomTov) continue
+
+            val entryErev = Calendar.getInstance(TIMEZONE).apply {
+                time = check.time
+                add(Calendar.DAY_OF_MONTH, -1)
+            }.time
+            val candle = computeCandleLighting(city, entryErev) ?: continue
+            if (candle.time <= now) continue
+
+            val kind = when {
+                isShabbat && isYomTov -> KedushaKind.SHABBAT_YOM_TOV_COMBINED
+                isYomTov -> KedushaKind.YOM_TOV
+                else -> KedushaKind.SHABBAT
+            }
+            return NextReminderTarget(candle, kind)
         }
         return null
+    }
+
+    /**
+     * Stable string key (yyyy-MM-dd in Asia/Jerusalem) for the upcoming Shabbat's
+     * Friday. Used to anchor weekly-rotating user content (Dvar Torah, etc.) so
+     * the app can tell whether a saved entry still matches the current week.
+     */
+    fun upcomingFridayKey(): String {
+        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply {
+            timeZone = TIMEZONE
+        }
+        return formatter.format(nextFriday())
     }
 
     private fun nextFriday(): Date {
